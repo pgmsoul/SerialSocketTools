@@ -14,9 +14,10 @@ namespace SocketSerialTools {
 	class Config {
 		public List<string> serial_baud_rate = new List<String>();
 		public string select_serial_port = "",file_name = "";
-		public int select_baud_rate = 115200;
+		public int select_baud_rate = 115200, pack_duration = 0;
 		public string send_encode = "ascii", recv_encode = "ascii";
 		public bool use_escape = false;
+		public string recv_js = "", send_js = "";
 		public Config() {
 			string rates = "9600,19200,38400,43000,56000,57600,115200";
 			string[] rl = rates.Split(',');

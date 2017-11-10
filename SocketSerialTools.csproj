@@ -118,6 +118,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="lib.cs" />
+    <Compile Include="MicroStopwatch .cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SendDataStorage.cs" />

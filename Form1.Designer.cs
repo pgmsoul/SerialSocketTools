@@ -71,12 +71,19 @@
 			this.pngList = new System.Windows.Forms.ImageList(this.components);
 			this.groupBoxSerial = new System.Windows.Forms.GroupBox();
 			this.测试 = new System.Windows.Forms.Button();
+			this.cbJs = new System.Windows.Forms.ComboBox();
+			this.jsLabel = new System.Windows.Forms.Label();
+			this.fsWatcher = new System.IO.FileSystemWatcher();
+			this.tbPackDuration = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			this.configGroup.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.groupBoxSerial.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ofDlg
@@ -96,9 +103,9 @@
 			this.configGroup.Controls.Add(this.cbBits);
 			this.configGroup.Controls.Add(this.label2);
 			this.configGroup.Location = new System.Drawing.Point(12, 78);
-			this.configGroup.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.configGroup.Margin = new System.Windows.Forms.Padding(2);
 			this.configGroup.Name = "configGroup";
-			this.configGroup.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.configGroup.Padding = new System.Windows.Forms.Padding(2);
 			this.configGroup.Size = new System.Drawing.Size(238, 70);
 			this.configGroup.TabIndex = 1;
 			this.configGroup.TabStop = false;
@@ -108,7 +115,7 @@
 			// 
 			this.cbBits.FormattingEnabled = true;
 			this.cbBits.Location = new System.Drawing.Point(66, 35);
-			this.cbBits.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.cbBits.Margin = new System.Windows.Forms.Padding(2);
 			this.cbBits.Name = "cbBits";
 			this.cbBits.Size = new System.Drawing.Size(160, 20);
 			this.cbBits.TabIndex = 3;
@@ -129,7 +136,7 @@
 			this.cbCom.DropDownWidth = 160;
 			this.cbCom.FormattingEnabled = true;
 			this.cbCom.Location = new System.Drawing.Point(14, 27);
-			this.cbCom.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.cbCom.Margin = new System.Windows.Forms.Padding(2);
 			this.cbCom.Name = "cbCom";
 			this.cbCom.Size = new System.Drawing.Size(542, 20);
 			this.cbCom.TabIndex = 1;
@@ -152,7 +159,7 @@
 			this.groupBox4.Controls.Add(this.srbHex);
 			this.groupBox4.Location = new System.Drawing.Point(270, 307);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(464, 382);
+			this.groupBox4.Size = new System.Drawing.Size(666, 382);
 			this.groupBox4.TabIndex = 8;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "发送数据";
@@ -172,7 +179,7 @@
 			// 
 			this.btnSaveData.ForeColor = System.Drawing.Color.Green;
 			this.btnSaveData.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnSaveData.Location = new System.Drawing.Point(379, 54);
+			this.btnSaveData.Location = new System.Drawing.Point(586, 54);
 			this.btnSaveData.Name = "btnSaveData";
 			this.btnSaveData.Size = new System.Drawing.Size(75, 23);
 			this.btnSaveData.TabIndex = 13;
@@ -183,7 +190,7 @@
 			// btnDeleteData
 			// 
 			this.btnDeleteData.ForeColor = System.Drawing.Color.Red;
-			this.btnDeleteData.Location = new System.Drawing.Point(378, 343);
+			this.btnDeleteData.Location = new System.Drawing.Point(585, 343);
 			this.btnDeleteData.Name = "btnDeleteData";
 			this.btnDeleteData.Size = new System.Drawing.Size(75, 23);
 			this.btnDeleteData.TabIndex = 12;
@@ -194,7 +201,7 @@
 			// btnDownData
 			// 
 			this.btnDownData.ForeColor = System.Drawing.Color.LightSeaGreen;
-			this.btnDownData.Location = new System.Drawing.Point(379, 214);
+			this.btnDownData.Location = new System.Drawing.Point(587, 267);
 			this.btnDownData.Name = "btnDownData";
 			this.btnDownData.Size = new System.Drawing.Size(75, 23);
 			this.btnDownData.TabIndex = 11;
@@ -206,7 +213,7 @@
 			// 
 			this.btnUpData.ForeColor = System.Drawing.Color.LightSeaGreen;
 			this.btnUpData.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnUpData.Location = new System.Drawing.Point(378, 185);
+			this.btnUpData.Location = new System.Drawing.Point(586, 238);
 			this.btnUpData.Name = "btnUpData";
 			this.btnUpData.Size = new System.Drawing.Size(75, 23);
 			this.btnUpData.TabIndex = 10;
@@ -222,9 +229,9 @@
 			this.historyDataBox.FullRowSelect = true;
 			this.historyDataBox.GridLines = true;
 			this.historyDataBox.HideSelection = false;
-			this.historyDataBox.Location = new System.Drawing.Point(16, 185);
+			this.historyDataBox.Location = new System.Drawing.Point(16, 238);
 			this.historyDataBox.Name = "historyDataBox";
-			this.historyDataBox.Size = new System.Drawing.Size(356, 181);
+			this.historyDataBox.Size = new System.Drawing.Size(554, 128);
 			this.historyDataBox.TabIndex = 9;
 			this.historyDataBox.UseCompatibleStateImageBehavior = false;
 			this.historyDataBox.View = System.Windows.Forms.View.Details;
@@ -251,7 +258,7 @@
 			// btnSendData
 			// 
 			this.btnSendData.ForeColor = System.Drawing.Color.Green;
-			this.btnSendData.Location = new System.Drawing.Point(379, 24);
+			this.btnSendData.Location = new System.Drawing.Point(586, 24);
 			this.btnSendData.Name = "btnSendData";
 			this.btnSendData.Size = new System.Drawing.Size(75, 23);
 			this.btnSendData.TabIndex = 6;
@@ -262,7 +269,7 @@
 			// srbGbk
 			// 
 			this.srbGbk.AutoSize = true;
-			this.srbGbk.Location = new System.Drawing.Point(236, 54);
+			this.srbGbk.Location = new System.Drawing.Point(469, 58);
 			this.srbGbk.Name = "srbGbk";
 			this.srbGbk.Size = new System.Drawing.Size(53, 16);
 			this.srbGbk.TabIndex = 4;
@@ -274,7 +281,7 @@
 			// srbUtf8
 			// 
 			this.srbUtf8.AutoSize = true;
-			this.srbUtf8.Location = new System.Drawing.Point(292, 54);
+			this.srbUtf8.Location = new System.Drawing.Point(525, 58);
 			this.srbUtf8.Name = "srbUtf8";
 			this.srbUtf8.Size = new System.Drawing.Size(47, 16);
 			this.srbUtf8.TabIndex = 3;
@@ -299,13 +306,13 @@
 			this.tbSend.Multiline = true;
 			this.tbSend.Name = "tbSend";
 			this.tbSend.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.tbSend.Size = new System.Drawing.Size(356, 101);
+			this.tbSend.Size = new System.Drawing.Size(554, 154);
 			this.tbSend.TabIndex = 0;
 			// 
 			// srbHex
 			// 
 			this.srbHex.AutoSize = true;
-			this.srbHex.Location = new System.Drawing.Point(189, 54);
+			this.srbHex.Location = new System.Drawing.Point(422, 58);
 			this.srbHex.Name = "srbHex";
 			this.srbHex.Size = new System.Drawing.Size(41, 16);
 			this.srbHex.TabIndex = 2;
@@ -316,6 +323,11 @@
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.label3);
+			this.groupBox2.Controls.Add(this.label1);
+			this.groupBox2.Controls.Add(this.tbPackDuration);
+			this.groupBox2.Controls.Add(this.jsLabel);
+			this.groupBox2.Controls.Add(this.cbJs);
 			this.groupBox2.Controls.Add(this.rbGbk);
 			this.groupBox2.Controls.Add(this.rbUtf8);
 			this.groupBox2.Controls.Add(this.rbHex);
@@ -323,7 +335,7 @@
 			this.groupBox2.Controls.Add(this.tbRecv);
 			this.groupBox2.Location = new System.Drawing.Point(270, 78);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(464, 205);
+			this.groupBox2.Size = new System.Drawing.Size(666, 205);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "接收数据";
@@ -331,7 +343,7 @@
 			// rbGbk
 			// 
 			this.rbGbk.AutoSize = true;
-			this.rbGbk.Location = new System.Drawing.Point(236, 20);
+			this.rbGbk.Location = new System.Drawing.Point(468, 19);
 			this.rbGbk.Name = "rbGbk";
 			this.rbGbk.Size = new System.Drawing.Size(53, 16);
 			this.rbGbk.TabIndex = 4;
@@ -343,7 +355,7 @@
 			// rbUtf8
 			// 
 			this.rbUtf8.AutoSize = true;
-			this.rbUtf8.Location = new System.Drawing.Point(296, 20);
+			this.rbUtf8.Location = new System.Drawing.Point(528, 19);
 			this.rbUtf8.Name = "rbUtf8";
 			this.rbUtf8.Size = new System.Drawing.Size(47, 16);
 			this.rbUtf8.TabIndex = 3;
@@ -355,7 +367,7 @@
 			// rbHex
 			// 
 			this.rbHex.AutoSize = true;
-			this.rbHex.Location = new System.Drawing.Point(189, 21);
+			this.rbHex.Location = new System.Drawing.Point(421, 20);
 			this.rbHex.Name = "rbHex";
 			this.rbHex.Size = new System.Drawing.Size(41, 16);
 			this.rbHex.TabIndex = 2;
@@ -380,7 +392,7 @@
 			this.tbRecv.Multiline = true;
 			this.tbRecv.Name = "tbRecv";
 			this.tbRecv.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.tbRecv.Size = new System.Drawing.Size(356, 140);
+			this.tbRecv.Size = new System.Drawing.Size(554, 140);
 			this.tbRecv.TabIndex = 0;
 			// 
 			// confList
@@ -490,7 +502,7 @@
             this.sendInfoBox});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 692);
 			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(744, 22);
+			this.statusStrip1.Size = new System.Drawing.Size(948, 22);
 			this.statusStrip1.TabIndex = 12;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
@@ -525,32 +537,95 @@
 			// 
 			// groupBoxSerial
 			// 
-			this.groupBoxSerial.Controls.Add(this.测试);
 			this.groupBoxSerial.Controls.Add(this.btnStartSerial);
 			this.groupBoxSerial.Controls.Add(this.cbCom);
 			this.groupBoxSerial.Location = new System.Drawing.Point(12, 12);
 			this.groupBoxSerial.Name = "groupBoxSerial";
-			this.groupBoxSerial.Size = new System.Drawing.Size(720, 60);
+			this.groupBoxSerial.Size = new System.Drawing.Size(618, 60);
 			this.groupBoxSerial.TabIndex = 13;
 			this.groupBoxSerial.TabStop = false;
 			this.groupBoxSerial.Text = "串口";
 			// 
 			// 测试
 			// 
-			this.测试.Location = new System.Drawing.Point(648, 26);
-			this.测试.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.测试.Location = new System.Drawing.Point(871, 39);
+			this.测试.Margin = new System.Windows.Forms.Padding(2);
 			this.测试.Name = "测试";
 			this.测试.Size = new System.Drawing.Size(56, 18);
 			this.测试.TabIndex = 3;
 			this.测试.Text = "btnTest";
 			this.测试.UseVisualStyleBackColor = true;
+			this.测试.Visible = false;
 			this.测试.Click += new System.EventHandler(this.测试_Click);
+			// 
+			// cbJs
+			// 
+			this.cbJs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbJs.FormattingEnabled = true;
+			this.cbJs.Items.AddRange(new object[] {
+            ""});
+			this.cbJs.Location = new System.Drawing.Point(198, 18);
+			this.cbJs.Name = "cbJs";
+			this.cbJs.Size = new System.Drawing.Size(180, 20);
+			this.cbJs.TabIndex = 5;
+			this.cbJs.SelectedIndexChanged += new System.EventHandler(this.cbJs_SelectedIndexChanged);
+			// 
+			// jsLabel
+			// 
+			this.jsLabel.AutoSize = true;
+			this.jsLabel.Location = new System.Drawing.Point(121, 21);
+			this.jsLabel.Name = "jsLabel";
+			this.jsLabel.Size = new System.Drawing.Size(71, 12);
+			this.jsLabel.TabIndex = 6;
+			this.jsLabel.Text = "JavaScript:";
+			// 
+			// fsWatcher
+			// 
+			this.fsWatcher.EnableRaisingEvents = true;
+			this.fsWatcher.Filter = "*.js";
+			this.fsWatcher.NotifyFilter = ((System.IO.NotifyFilters)((System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.LastWrite)));
+			this.fsWatcher.Path = ".\\js";
+			this.fsWatcher.SynchronizingObject = this;
+			this.fsWatcher.Changed += new System.IO.FileSystemEventHandler(this.fsWatcher_Changed);
+			this.fsWatcher.Created += new System.IO.FileSystemEventHandler(this.fsWatcher_Created);
+			this.fsWatcher.Deleted += new System.IO.FileSystemEventHandler(this.fsWatcher_Deleted);
+			this.fsWatcher.Renamed += new System.IO.RenamedEventHandler(this.fsWatcher_Renamed);
+			// 
+			// tbPackDuration
+			// 
+			this.tbPackDuration.Location = new System.Drawing.Point(586, 72);
+			this.tbPackDuration.Name = "tbPackDuration";
+			this.tbPackDuration.Size = new System.Drawing.Size(52, 21);
+			this.tbPackDuration.TabIndex = 7;
+			this.tbPackDuration.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.tbPackDuration.TextChanged += new System.EventHandler(this.tbPackDuration_TextChanged);
+			this.tbPackDuration.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPackDuration_KeyPress);
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(585, 46);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(53, 12);
+			this.label1.TabIndex = 8;
+			this.label1.Text = "分包间隔";
+			this.toolTip1.SetToolTip(this.label1, "每次接收的数据自然分包不一定和发送的时候相同，\r\n速率较慢的时候，接收端可能分多次接收一个数据包，\r\n设置一个时间，来定义间隔多少毫秒算一个数据包");
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(640, 76);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(17, 12);
+			this.label3.TabIndex = 9;
+			this.label3.Text = "ms";
 			// 
 			// TransferForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(744, 714);
+			this.ClientSize = new System.Drawing.Size(948, 714);
+			this.Controls.Add(this.测试);
 			this.Controls.Add(this.groupBoxSerial);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.groupBox1);
@@ -575,6 +650,7 @@
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.groupBoxSerial.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -628,6 +704,12 @@
 		private System.Windows.Forms.ImageList pngList;
 		private System.Windows.Forms.CheckBox cbEscape;
 		private System.Windows.Forms.Button 测试;
+		private System.Windows.Forms.Label jsLabel;
+		private System.Windows.Forms.ComboBox cbJs;
+		private System.IO.FileSystemWatcher fsWatcher;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.TextBox tbPackDuration;
+		private System.Windows.Forms.Label label3;
 
     }
 }

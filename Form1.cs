@@ -21,7 +21,7 @@ namespace SocketSerialTools {
 	public partial class TransferForm : Form {
 		#region variable
 		private static List<TransferForm> formList = new List<TransferForm>();
-		public string EditConfName;
+		public string EditConfName,recvJs = "";
 		private Config cfg = null;
 		private SendDataStorage sds = null;
 		private bool initComplete = false;
@@ -29,31 +29,70 @@ namespace SocketSerialTools {
 		#endregion
 		
 		#region SerialPort
-		private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e) {
-			byte[] buffer = new byte[1024];
-			int n = serialPort.Read(buffer, 0, 1024);
-			if (cfg.recv_encode == "ascii") {
-				string str = System.Text.Encoding.GetEncoding("GBK").GetString(buffer, 0, n);
-				tbRecv.AppendText(str);
-			} else if (cfg.recv_encode == "utf8") {
-				string str = System.Text.Encoding.UTF8.GetString(buffer,0,n);
-				tbRecv.AppendText(str);
-			} else if (cfg.recv_encode == "hex") {
-				string hex = byteToHex(buffer,n);
-				tbRecv.AppendText(hex);
+		private class PackParser {
+			public byte[] buffer = new byte[1024 * 16];
+			public long lastPackTick = 0;
+			public int offset = 0;
+		}
+		PackParser pack = new PackParser();
+		MicroTimer packTimer = new MicroTimer();
+		private void initPackTimer() {
+			packTimer.MicroTimerElapsed += new MicroTimer.MicroTimerElapsedEventHandler(OnPackTimer);
+			packTimer.Interval = 1000;
+			packTimer.Enabled = true;
+		}
+		private void OnPackTimer(object sender, MicroTimerEventArgs timerEventArgs) {
+				//this.BeginInvoke(new MethodInvoker(delegate {
+					//Debug.Print(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff"));
+				//}));
+			checkPackData();
+		}
+		private void checkPackData() {
+			lock (recvLock) {
+				if (pack.offset == 0)
+					return;
+				long span = DateTime.Now.Ticks - pack.lastPackTick;
+				if (span > cfg.pack_duration * 10000 || pack.offset >= 1024 * 16) {
+					Debug.Print("span: " + span);
+					parsePack(pack.buffer, pack.offset);
+					pack.offset = 0;
+					pack.lastPackTick = DateTime.Now.Ticks;
+				}
 			}
-			Debug.Print(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff"));
+		}
+		object recvLock = new object();
+		private void serialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e) {
+			lock (recvLock) {
+				pack.offset += serialPort.Read(pack.buffer, pack.offset, 1024 * 16 - pack.offset);
+				pack.lastPackTick = DateTime.Now.Ticks;
+			}
+		}
+		private void parsePack(byte[] buffer,int n) {
+			string str = "";
+			if (cfg.recv_encode == "ascii") {
+				str = System.Text.Encoding.GetEncoding("GBK").GetString(buffer, 0, n);
+			} else if (cfg.recv_encode == "utf8") {
+				str = System.Text.Encoding.UTF8.GetString(buffer, 0, n);
+			} else if (cfg.recv_encode == "hex") {
+				str = byteToHex(buffer, n);
+			} else {
+				return;
+			}
+			if (recvJs != null && recvJs != "") {
+				str = handleJs(recvJs, str);
+			}
+			tbRecv.AppendText(str);
 			showRecvCount(n);
 		}
 		private void close_Serial() {
 			if (serialPort.IsOpen) {
 				serialPort.Close();
-				btnStartSerial.ImageIndex = 0;
 				showSuccessTip("串口关闭成功");
 			} else {
 				showRedTip("串口已经关闭");
-				btnStartSerial.ImageIndex = 1;
 			}
+			cbCom.Enabled = true;
+			btnStartSerial.ImageIndex = 0;
 			toolTip1.SetToolTip(btnStartSerial, "打开串口");
 		}
 		private bool open_Serial() {
@@ -64,9 +103,9 @@ namespace SocketSerialTools {
 			if (!int.TryParse(cbBits.Text, out baud)) {
 				return false;
 			}
-			serialPort.PortName = SerialPortTool.GetSerialPortByName(cbCom.Text);
-			serialPort.BaudRate = baud;
 			try {
+				serialPort.PortName = SerialPortTool.GetSerialPortByName(cbCom.Text);
+				serialPort.BaudRate = baud;
 				serialPort.Open();
 			} catch (System.IO.IOException ioe) {
 				showRedTip(ioe.Message);
@@ -82,6 +121,7 @@ namespace SocketSerialTools {
 				return false;
 			}
 			btnStartSerial.ImageIndex = 1;
+			cbCom.Enabled = false;
 			toolTip1.SetToolTip(btnStartSerial, "关闭串口");
 			showSuccessTip(serialPort.PortName + ": 打开成功, 速率: " + baud);
 			int index = cfg.serial_baud_rate.IndexOf(baud.ToString());
@@ -126,11 +166,20 @@ namespace SocketSerialTools {
 				string com = sl[i];
 				if (cbCom.Items.IndexOf(com) == -1) {
 					cbCom.Items.Add(com);
+					if (cfg.select_serial_port == com) {
+						cbCom.SelectedItem = com;
+					}
 				}
 			}
 			for (int i = cbCom.Items.Count - 1; i >= 0; i--) {
 				string com = cbCom.Items[i].ToString();
 				if (sl.IndexOf(com) == -1) {
+					if (cbCom.SelectedIndex == i) {
+						cbCom.Enabled = true;
+						btnStartSerial.ImageIndex = 0;
+						toolTip1.SetToolTip(btnStartSerial, "打开串口");
+						showRedTip("串口被移除");
+					}
 					cbCom.Items.RemoveAt(i);
 				}
 			}
@@ -160,7 +209,18 @@ namespace SocketSerialTools {
 					return "名称为 [" + name + "] 的配置已经存在，请使用其它名称";
 				}
 				string src = ".\\conf\\" + EditConfName;
-				File.Copy(src,path);
+				try {
+					//File.Copy(src, path);
+					FileInfo file = new FileInfo(src);
+					if (file.Exists) {
+						file.CopyTo(path);
+						
+					} else {
+						return "源文件不存在: "+src;
+					}
+				} catch (Exception e) {
+					return e.Message+"(不能是 COM1 等串口名称)";
+				}
 				refreshAllConfList(ConfListChangeType.Add, name);
 			} else {
 				//编辑配置
@@ -172,7 +232,12 @@ namespace SocketSerialTools {
 					return "名称为 ["+name+"] 的配置已经存在，请使用其它名称";
 				}
 				FileInfo fi = new FileInfo(".\\conf\\"+EditConfName);
-				fi.MoveTo(path);
+
+				try {
+					fi.MoveTo(path);
+				} catch (Exception e) {
+					return e.Message + "(不能是 COM1 等串口名称)";
+				}
 				refreshAllConfList(ConfListChangeType.Rename, name,EditConfName);
 			}
 			return "";
@@ -207,6 +272,25 @@ namespace SocketSerialTools {
 		#endregion
 
 		#region Method
+		private string handleJs(string js, string raw) {
+			string str = "";
+			using (JavascriptContext context = new JavascriptContext()) {
+				context.SetParameter("input", raw);
+				try {
+					context.Run(js);
+					str = context.GetParameter("output").ToString();
+				} catch (JavascriptException je) {
+					str = "\r\n\r\ninput: " + raw;
+					str += "\r\n" + je.Message;
+					str += "\r\nLine: " + je.Line;
+					str += "\r\nColum: " + je.StartColumn + " - " + je.EndColumn;
+					string[] lines = js.Split('\n');
+					str += "\r\nSource:\r\n" + lines[je.Line-1];
+					return str;
+				}
+			}
+			return str;
+		}
 		private static void refreshAllConfList(ConfListChangeType type, string confName, string oldName = "") {
 			for (int i = 0; i < formList.Count; i++) {
 				TransferForm form = formList[i];
@@ -303,6 +387,14 @@ namespace SocketSerialTools {
 				confList.Items.Add(f.ToString());
 			}
 		}
+		private void loadJs() {
+			DirectoryInfo di = new DirectoryInfo(".\\js");
+			FileInfo[] fi = di.GetFiles("*.js");
+			foreach (var f in fi) {
+				cbJs.Items.Add(f.ToString());
+			}
+			cbJs.SelectedItem = cfg.recv_js;
+		}
 		private string confNameToDataName(string conf) {
 			conf = conf.ToLower();
 			if (conf == "")
@@ -368,7 +460,9 @@ namespace SocketSerialTools {
 
 			initConfList();
 
-			this.Text = this.Text + " - [" + c.file_name + "]";
+			tbPackDuration.Text = cfg.pack_duration.ToString();
+
+			this.Text = "" + c.file_name + " -- " + this.Text;
 		}
 		private void showTip(string tip) {
 			infoBox.Text = tip;
@@ -394,15 +488,18 @@ namespace SocketSerialTools {
 
 		#region Events
 		public TransferForm() {
-			InitializeComponent();
-			loadConfig("");
-			loadData("");
-			System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+			Construct("");
 		}
 		public TransferForm(string conf) {
+			Construct(conf);
+		}
+		private void Construct(string conf) {
+			Directory.CreateDirectory(".\\js");
 			InitializeComponent();
 			loadConfig(conf);
 			loadData(conf);
+			loadJs();
+			initPackTimer();
 			initComplete = true;
 			System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
 		}
@@ -502,6 +599,7 @@ namespace SocketSerialTools {
 			formList.Add(this);
 		}
 		private void TransferForm_FormClosing(object sender, FormClosingEventArgs e) {
+			packTimer.Enabled = false;
 			close_Serial();
 		}
 		private void TransferForm_FormClosed(object sender, FormClosedEventArgs e) {
@@ -629,6 +727,82 @@ namespace SocketSerialTools {
 			cfg.use_escape = cbEscape.Checked;
 			cfg.Save();
 		}
+		private void cbJs_SelectedIndexChanged(object sender, EventArgs e) {
+			cfg.recv_js = cbJs.Text;
+			cfg.Save();
+			loadJsContent();
+		}
+		long lastLoadTime = 0;
+		private void loadJsContent() {
+			if (DateTime.Now.Ticks - lastLoadTime < 10000) {//小于一毫秒跳过
+				return;
+			}
+			string path = ".\\js\\" + cfg.recv_js;
+			FileStream fs = null;
+			try {
+				fs = new FileStream(path, FileMode.Open);
+				//防止文件太大（16M）
+				if (fs.Length > 0x1000000) {
+					fs.Close();
+					return;
+				}
+				byte[] data = new byte[fs.Length];
+				fs.Seek(0, SeekOrigin.Begin);
+				fs.Read(data, 0, data.Length);
+				recvJs = System.Text.Encoding.UTF8.GetString(data);
+				fs.Close();
+			} catch (IOException err) {
+				showRedTip(err.ToString());
+			}
+			lastLoadTime = DateTime.Now.Ticks;
+		}
+		private void fsWatcher_Changed(object sender, FileSystemEventArgs e) {
+			Debug.Print("changed:" + e.Name);
+			if (e.ChangeType == WatcherChangeTypes.Changed && e.Name.ToLower() == cfg.recv_js.ToLower()) {
+				loadJsContent();
+			}
+		}
+		private void fsWatcher_Renamed(object sender, RenamedEventArgs e) {
+			Debug.Print("renamed:" + e.Name);
+			if (e.ChangeType == WatcherChangeTypes.Renamed) {
+				int index = cbJs.Items.IndexOf(e.OldName);
+				if (index != -1) {
+					cbJs.Items[index] = e.Name;
+				} else {
+					cbJs.Items.Add(e.Name);
+				}
+			}
+		}
+		private void fsWatcher_Created(object sender, FileSystemEventArgs e) {
+			int index = cbJs.Items.IndexOf(e.Name);
+			if (index == -1) {
+				cbJs.Items.Add(e.Name);
+			}
+			Debug.Print("create:" + e.Name);
+		}
+		private void fsWatcher_Deleted(object sender, FileSystemEventArgs e) {
+			int index = cbJs.Items.IndexOf(e.Name);
+			if (index != -1) {
+				cbJs.Items.RemoveAt(index);
+				cfg.recv_js = "";
+				recvJs = "";
+			}
+			Debug.Print("delete:" + e.Name);
+		}
+		private void tbPackDuration_TextChanged(object sender, EventArgs e) {
+			int ms = 0;
+			if (int.TryParse(tbPackDuration.Text,out ms)) {
+				cfg.pack_duration = ms;
+				cfg.Save();
+			}
+		}
+		private void tbPackDuration_KeyPress(object sender, KeyPressEventArgs e) {
+			if (Char.IsNumber(e.KeyChar) || e.KeyChar == 8) {
+				e.Handled = false;
+			} else {
+				e.Handled = true;
+			}
+		}
 		#endregion
 
 		#region Test
@@ -641,6 +815,9 @@ namespace SocketSerialTools {
 			}
 		}
 		private void 测试_Click(object sender, EventArgs e) {
+			packTimer.Enabled = !packTimer.Enabled;
+		}
+		private void js_test(){
 			using (JavascriptContext context = new JavascriptContext()) {
 
 				// Setting external parameters for the context
@@ -652,12 +829,19 @@ namespace SocketSerialTools {
 				string script = @"
         var i;
         for (i = 0; i < 5; i++)
-            console.Print(message + ' (' + i + ')');
+            console.Print(message + ' (' + i + j')');
         number += i;
     ";
-
-				// Running the script
-				context.Run(script);
+				try {
+					// Running the script
+					context.Run(script);
+				} catch (JavascriptException je) {
+					string msg = je.Message;
+					msg += "\r\nLine: " + je.Line;
+					msg += "\r\nColum: " + je.StartColumn + " - " + je.EndColumn;
+					msg += "\r\n文件:" + je.Source;
+					MessageBox.Show(msg);
+				}
 
 				// Getting a parameter
 				Console.WriteLine("number: " + context.GetParameter("number"));
