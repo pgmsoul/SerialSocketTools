@@ -27,9 +27,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TransferForm));
 			this.ofDlg = new System.Windows.Forms.OpenFileDialog();
 			this.sfDlg = new System.Windows.Forms.SaveFileDialog();
-			this.configGroup = new System.Windows.Forms.GroupBox();
 			this.cbBits = new System.Windows.Forms.ComboBox();
-			this.label2 = new System.Windows.Forms.Label();
 			this.cbCom = new System.Windows.Forms.ComboBox();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.cbEscape = new System.Windows.Forms.CheckBox();
@@ -48,6 +46,11 @@
 			this.tbSend = new System.Windows.Forms.TextBox();
 			this.srbHex = new System.Windows.Forms.RadioButton();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
+			this.tbPackDuration = new System.Windows.Forms.TextBox();
+			this.jsLabel = new System.Windows.Forms.Label();
+			this.cbJs = new System.Windows.Forms.ComboBox();
 			this.rbGbk = new System.Windows.Forms.RadioButton();
 			this.rbUtf8 = new System.Windows.Forms.RadioButton();
 			this.rbHex = new System.Windows.Forms.RadioButton();
@@ -67,23 +70,42 @@
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.sendInfoBox = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.btnStartSerial = new System.Windows.Forms.Button();
 			this.pngList = new System.Windows.Forms.ImageList(this.components);
-			this.groupBoxSerial = new System.Windows.Forms.GroupBox();
 			this.测试 = new System.Windows.Forms.Button();
-			this.cbJs = new System.Windows.Forms.ComboBox();
-			this.jsLabel = new System.Windows.Forms.Label();
 			this.fsWatcher = new System.IO.FileSystemWatcher();
-			this.tbPackDuration = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
-			this.configGroup.SuspendLayout();
+			this.tabMode = new System.Windows.Forms.TabControl();
+			this.tabSerial = new System.Windows.Forms.TabPage();
+			this.tabUdpClient = new System.Windows.Forms.TabPage();
+			this.tabTcpServ = new System.Windows.Forms.TabPage();
+			this.tabTcpClient = new System.Windows.Forms.TabPage();
+			this.label2 = new System.Windows.Forms.Label();
+			this.btnStartSerial = new System.Windows.Forms.Button();
+			this.button2 = new System.Windows.Forms.Button();
+			this.label8 = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.comboBox3 = new System.Windows.Forms.ComboBox();
+			this.comboBox4 = new System.Windows.Forms.ComboBox();
+			this.button3 = new System.Windows.Forms.Button();
+			this.label10 = new System.Windows.Forms.Label();
+			this.label11 = new System.Windows.Forms.Label();
+			this.comboBox5 = new System.Windows.Forms.ComboBox();
+			this.comboBox6 = new System.Windows.Forms.ComboBox();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label7 = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.cbUdpClientPort = new System.Windows.Forms.ComboBox();
+			this.cbUdpClientIP = new System.Windows.Forms.ComboBox();
+			this.btnStartUDPServ = new System.Windows.Forms.Button();
 			this.groupBox4.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
-			this.groupBoxSerial.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).BeginInit();
+			this.tabMode.SuspendLayout();
+			this.tabSerial.SuspendLayout();
+			this.tabUdpClient.SuspendLayout();
+			this.tabTcpServ.SuspendLayout();
+			this.tabTcpClient.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// ofDlg
@@ -98,44 +120,21 @@
 			this.sfDlg.Filter = "配置文件|*.lay";
 			this.sfDlg.RestoreDirectory = true;
 			// 
-			// configGroup
-			// 
-			this.configGroup.Controls.Add(this.cbBits);
-			this.configGroup.Controls.Add(this.label2);
-			this.configGroup.Location = new System.Drawing.Point(12, 78);
-			this.configGroup.Margin = new System.Windows.Forms.Padding(2);
-			this.configGroup.Name = "configGroup";
-			this.configGroup.Padding = new System.Windows.Forms.Padding(2);
-			this.configGroup.Size = new System.Drawing.Size(238, 70);
-			this.configGroup.TabIndex = 1;
-			this.configGroup.TabStop = false;
-			this.configGroup.Text = "串口设置";
-			// 
 			// cbBits
 			// 
 			this.cbBits.FormattingEnabled = true;
-			this.cbBits.Location = new System.Drawing.Point(66, 35);
+			this.cbBits.Location = new System.Drawing.Point(61, 23);
 			this.cbBits.Margin = new System.Windows.Forms.Padding(2);
 			this.cbBits.Name = "cbBits";
 			this.cbBits.Size = new System.Drawing.Size(160, 20);
 			this.cbBits.TabIndex = 3;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(12, 37);
-			this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(41, 12);
-			this.label2.TabIndex = 2;
-			this.label2.Text = "波特率";
 			// 
 			// cbCom
 			// 
 			this.cbCom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbCom.DropDownWidth = 160;
 			this.cbCom.FormattingEnabled = true;
-			this.cbCom.Location = new System.Drawing.Point(14, 27);
+			this.cbCom.Location = new System.Drawing.Point(270, 23);
 			this.cbCom.Margin = new System.Windows.Forms.Padding(2);
 			this.cbCom.Name = "cbCom";
 			this.cbCom.Size = new System.Drawing.Size(542, 20);
@@ -157,7 +156,7 @@
 			this.groupBox4.Controls.Add(this.btnClearSend);
 			this.groupBox4.Controls.Add(this.tbSend);
 			this.groupBox4.Controls.Add(this.srbHex);
-			this.groupBox4.Location = new System.Drawing.Point(270, 307);
+			this.groupBox4.Location = new System.Drawing.Point(270, 353);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(666, 382);
 			this.groupBox4.TabIndex = 8;
@@ -324,6 +323,7 @@
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.label3);
+			this.groupBox2.Controls.Add(this.测试);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.Controls.Add(this.tbPackDuration);
 			this.groupBox2.Controls.Add(this.jsLabel);
@@ -333,12 +333,62 @@
 			this.groupBox2.Controls.Add(this.rbHex);
 			this.groupBox2.Controls.Add(this.btnClearRecv);
 			this.groupBox2.Controls.Add(this.tbRecv);
-			this.groupBox2.Location = new System.Drawing.Point(270, 78);
+			this.groupBox2.Location = new System.Drawing.Point(270, 135);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(666, 205);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "接收数据";
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(640, 76);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(17, 12);
+			this.label3.TabIndex = 9;
+			this.label3.Text = "ms";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(585, 46);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(53, 12);
+			this.label1.TabIndex = 8;
+			this.label1.Text = "分包间隔";
+			this.toolTip1.SetToolTip(this.label1, "每次接收的数据自然分包不一定和发送的时候相同，\r\n速率较慢的时候，接收端可能分多次接收一个数据包，\r\n设置一个时间，来定义间隔多少毫秒算一个数据包");
+			// 
+			// tbPackDuration
+			// 
+			this.tbPackDuration.Location = new System.Drawing.Point(586, 72);
+			this.tbPackDuration.Name = "tbPackDuration";
+			this.tbPackDuration.Size = new System.Drawing.Size(52, 21);
+			this.tbPackDuration.TabIndex = 7;
+			this.tbPackDuration.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			this.tbPackDuration.TextChanged += new System.EventHandler(this.tbPackDuration_TextChanged);
+			this.tbPackDuration.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPackDuration_KeyPress);
+			// 
+			// jsLabel
+			// 
+			this.jsLabel.AutoSize = true;
+			this.jsLabel.Location = new System.Drawing.Point(121, 21);
+			this.jsLabel.Name = "jsLabel";
+			this.jsLabel.Size = new System.Drawing.Size(71, 12);
+			this.jsLabel.TabIndex = 6;
+			this.jsLabel.Text = "JavaScript:";
+			// 
+			// cbJs
+			// 
+			this.cbJs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbJs.FormattingEnabled = true;
+			this.cbJs.Items.AddRange(new object[] {
+            ""});
+			this.cbJs.Location = new System.Drawing.Point(198, 18);
+			this.cbJs.Name = "cbJs";
+			this.cbJs.Size = new System.Drawing.Size(180, 20);
+			this.cbJs.TabIndex = 5;
+			this.cbJs.SelectedIndexChanged += new System.EventHandler(this.cbJs_SelectedIndexChanged);
 			// 
 			// rbGbk
 			// 
@@ -412,7 +462,7 @@
 			this.groupBox1.Controls.Add(this.btnLoad);
 			this.groupBox1.Controls.Add(this.btnCopy);
 			this.groupBox1.Controls.Add(this.confList);
-			this.groupBox1.Location = new System.Drawing.Point(12, 193);
+			this.groupBox1.Location = new System.Drawing.Point(12, 135);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(236, 496);
 			this.groupBox1.TabIndex = 11;
@@ -500,7 +550,7 @@
             this.infoBox,
             this.recvInfoBox,
             this.sendInfoBox});
-			this.statusStrip1.Location = new System.Drawing.Point(0, 692);
+			this.statusStrip1.Location = new System.Drawing.Point(0, 744);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Size = new System.Drawing.Size(948, 22);
 			this.statusStrip1.TabIndex = 12;
@@ -514,20 +564,6 @@
 			this.sendInfoBox.Size = new System.Drawing.Size(160, 17);
 			this.sendInfoBox.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// btnStartSerial
-			// 
-			this.btnStartSerial.FlatAppearance.BorderSize = 0;
-			this.btnStartSerial.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnStartSerial.ImageIndex = 0;
-			this.btnStartSerial.ImageList = this.pngList;
-			this.btnStartSerial.Location = new System.Drawing.Point(566, 20);
-			this.btnStartSerial.Name = "btnStartSerial";
-			this.btnStartSerial.Size = new System.Drawing.Size(31, 32);
-			this.btnStartSerial.TabIndex = 2;
-			this.toolTip1.SetToolTip(this.btnStartSerial, "打开串口");
-			this.btnStartSerial.UseVisualStyleBackColor = true;
-			this.btnStartSerial.Click += new System.EventHandler(this.btnStartSerial_Click);
-			// 
 			// pngList
 			// 
 			this.pngList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("pngList.ImageStream")));
@@ -535,20 +571,9 @@
 			this.pngList.Images.SetKeyName(0, "play.png");
 			this.pngList.Images.SetKeyName(1, "stop.png");
 			// 
-			// groupBoxSerial
-			// 
-			this.groupBoxSerial.Controls.Add(this.btnStartSerial);
-			this.groupBoxSerial.Controls.Add(this.cbCom);
-			this.groupBoxSerial.Location = new System.Drawing.Point(12, 12);
-			this.groupBoxSerial.Name = "groupBoxSerial";
-			this.groupBoxSerial.Size = new System.Drawing.Size(618, 60);
-			this.groupBoxSerial.TabIndex = 13;
-			this.groupBoxSerial.TabStop = false;
-			this.groupBoxSerial.Text = "串口";
-			// 
 			// 测试
 			// 
-			this.测试.Location = new System.Drawing.Point(871, 39);
+			this.测试.Location = new System.Drawing.Point(587, 128);
 			this.测试.Margin = new System.Windows.Forms.Padding(2);
 			this.测试.Name = "测试";
 			this.测试.Size = new System.Drawing.Size(56, 18);
@@ -557,27 +582,6 @@
 			this.测试.UseVisualStyleBackColor = true;
 			this.测试.Visible = false;
 			this.测试.Click += new System.EventHandler(this.测试_Click);
-			// 
-			// cbJs
-			// 
-			this.cbJs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cbJs.FormattingEnabled = true;
-			this.cbJs.Items.AddRange(new object[] {
-            ""});
-			this.cbJs.Location = new System.Drawing.Point(198, 18);
-			this.cbJs.Name = "cbJs";
-			this.cbJs.Size = new System.Drawing.Size(180, 20);
-			this.cbJs.TabIndex = 5;
-			this.cbJs.SelectedIndexChanged += new System.EventHandler(this.cbJs_SelectedIndexChanged);
-			// 
-			// jsLabel
-			// 
-			this.jsLabel.AutoSize = true;
-			this.jsLabel.Location = new System.Drawing.Point(121, 21);
-			this.jsLabel.Name = "jsLabel";
-			this.jsLabel.Size = new System.Drawing.Size(71, 12);
-			this.jsLabel.TabIndex = 6;
-			this.jsLabel.Text = "JavaScript:";
 			// 
 			// fsWatcher
 			// 
@@ -591,47 +595,285 @@
 			this.fsWatcher.Deleted += new System.IO.FileSystemEventHandler(this.fsWatcher_Deleted);
 			this.fsWatcher.Renamed += new System.IO.RenamedEventHandler(this.fsWatcher_Renamed);
 			// 
-			// tbPackDuration
+			// tabMode
 			// 
-			this.tbPackDuration.Location = new System.Drawing.Point(586, 72);
-			this.tbPackDuration.Name = "tbPackDuration";
-			this.tbPackDuration.Size = new System.Drawing.Size(52, 21);
-			this.tbPackDuration.TabIndex = 7;
-			this.tbPackDuration.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			this.tbPackDuration.TextChanged += new System.EventHandler(this.tbPackDuration_TextChanged);
-			this.tbPackDuration.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbPackDuration_KeyPress);
+			this.tabMode.Controls.Add(this.tabSerial);
+			this.tabMode.Controls.Add(this.tabUdpClient);
+			this.tabMode.Controls.Add(this.tabTcpServ);
+			this.tabMode.Controls.Add(this.tabTcpClient);
+			this.tabMode.Location = new System.Drawing.Point(12, 12);
+			this.tabMode.Name = "tabMode";
+			this.tabMode.SelectedIndex = 0;
+			this.tabMode.Size = new System.Drawing.Size(924, 101);
+			this.tabMode.TabIndex = 14;
+			this.tabMode.SelectedIndexChanged += new System.EventHandler(this.tabMode_SelectedIndexChanged);
 			// 
-			// label1
+			// tabSerial
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(585, 46);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(53, 12);
-			this.label1.TabIndex = 8;
-			this.label1.Text = "分包间隔";
-			this.toolTip1.SetToolTip(this.label1, "每次接收的数据自然分包不一定和发送的时候相同，\r\n速率较慢的时候，接收端可能分多次接收一个数据包，\r\n设置一个时间，来定义间隔多少毫秒算一个数据包");
+			this.tabSerial.Controls.Add(this.cbCom);
+			this.tabSerial.Controls.Add(this.label2);
+			this.tabSerial.Controls.Add(this.btnStartSerial);
+			this.tabSerial.Controls.Add(this.cbBits);
+			this.tabSerial.Location = new System.Drawing.Point(4, 22);
+			this.tabSerial.Name = "tabSerial";
+			this.tabSerial.Padding = new System.Windows.Forms.Padding(3);
+			this.tabSerial.Size = new System.Drawing.Size(916, 75);
+			this.tabSerial.TabIndex = 0;
+			this.tabSerial.Text = "串口模式";
+			this.tabSerial.UseVisualStyleBackColor = true;
 			// 
-			// label3
+			// tabUdpClient
 			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(640, 76);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(17, 12);
-			this.label3.TabIndex = 9;
-			this.label3.Text = "ms";
+			this.tabUdpClient.Controls.Add(this.btnStartUDPServ);
+			this.tabUdpClient.Controls.Add(this.label12);
+			this.tabUdpClient.Controls.Add(this.label6);
+			this.tabUdpClient.Controls.Add(this.label7);
+			this.tabUdpClient.Controls.Add(this.cbUdpClientIP);
+			this.tabUdpClient.Controls.Add(this.cbUdpClientPort);
+			this.tabUdpClient.Location = new System.Drawing.Point(4, 22);
+			this.tabUdpClient.Name = "tabUdpClient";
+			this.tabUdpClient.Size = new System.Drawing.Size(916, 75);
+			this.tabUdpClient.TabIndex = 2;
+			this.tabUdpClient.Text = "UDP通讯";
+			this.tabUdpClient.UseVisualStyleBackColor = true;
+			// 
+			// tabTcpServ
+			// 
+			this.tabTcpServ.Controls.Add(this.button2);
+			this.tabTcpServ.Controls.Add(this.label8);
+			this.tabTcpServ.Controls.Add(this.label9);
+			this.tabTcpServ.Controls.Add(this.comboBox3);
+			this.tabTcpServ.Controls.Add(this.comboBox4);
+			this.tabTcpServ.Location = new System.Drawing.Point(4, 22);
+			this.tabTcpServ.Name = "tabTcpServ";
+			this.tabTcpServ.Size = new System.Drawing.Size(916, 75);
+			this.tabTcpServ.TabIndex = 3;
+			this.tabTcpServ.Text = "TCP服务器";
+			this.tabTcpServ.UseVisualStyleBackColor = true;
+			// 
+			// tabTcpClient
+			// 
+			this.tabTcpClient.Controls.Add(this.button3);
+			this.tabTcpClient.Controls.Add(this.label10);
+			this.tabTcpClient.Controls.Add(this.label11);
+			this.tabTcpClient.Controls.Add(this.comboBox5);
+			this.tabTcpClient.Controls.Add(this.comboBox6);
+			this.tabTcpClient.Location = new System.Drawing.Point(4, 22);
+			this.tabTcpClient.Name = "tabTcpClient";
+			this.tabTcpClient.Size = new System.Drawing.Size(916, 75);
+			this.tabTcpClient.TabIndex = 4;
+			this.tabTcpClient.Text = "TCP客户端";
+			this.tabTcpClient.UseVisualStyleBackColor = true;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(8, 26);
+			this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(41, 12);
+			this.label2.TabIndex = 2;
+			this.label2.Text = "波特率";
+			// 
+			// btnStartSerial
+			// 
+			this.btnStartSerial.FlatAppearance.BorderSize = 0;
+			this.btnStartSerial.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnStartSerial.ImageIndex = 0;
+			this.btnStartSerial.ImageList = this.pngList;
+			this.btnStartSerial.Location = new System.Drawing.Point(839, 16);
+			this.btnStartSerial.Name = "btnStartSerial";
+			this.btnStartSerial.Size = new System.Drawing.Size(31, 32);
+			this.btnStartSerial.TabIndex = 2;
+			this.toolTip1.SetToolTip(this.btnStartSerial, "打开串口");
+			this.btnStartSerial.UseVisualStyleBackColor = true;
+			this.btnStartSerial.Click += new System.EventHandler(this.btnStartSerial_Click);
+			// 
+			// button2
+			// 
+			this.button2.FlatAppearance.BorderSize = 0;
+			this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.button2.ImageIndex = 0;
+			this.button2.ImageList = this.pngList;
+			this.button2.Location = new System.Drawing.Point(563, 14);
+			this.button2.Name = "button2";
+			this.button2.Size = new System.Drawing.Size(31, 32);
+			this.button2.TabIndex = 13;
+			this.toolTip1.SetToolTip(this.button2, "打开串口");
+			this.button2.UseVisualStyleBackColor = true;
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(290, 24);
+			this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(29, 12);
+			this.label8.TabIndex = 12;
+			this.label8.Text = "端口";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Location = new System.Drawing.Point(8, 24);
+			this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(17, 12);
+			this.label9.TabIndex = 11;
+			this.label9.Text = "IP";
+			// 
+			// comboBox3
+			// 
+			this.comboBox3.FormattingEnabled = true;
+			this.comboBox3.Items.AddRange(new object[] {
+            "0.0.0.0"});
+			this.comboBox3.Location = new System.Drawing.Point(61, 21);
+			this.comboBox3.Margin = new System.Windows.Forms.Padding(2);
+			this.comboBox3.Name = "comboBox3";
+			this.comboBox3.Size = new System.Drawing.Size(160, 20);
+			this.comboBox3.TabIndex = 10;
+			// 
+			// comboBox4
+			// 
+			this.comboBox4.FormattingEnabled = true;
+			this.comboBox4.Location = new System.Drawing.Point(340, 21);
+			this.comboBox4.Margin = new System.Windows.Forms.Padding(2);
+			this.comboBox4.Name = "comboBox4";
+			this.comboBox4.Size = new System.Drawing.Size(160, 20);
+			this.comboBox4.TabIndex = 9;
+			// 
+			// button3
+			// 
+			this.button3.FlatAppearance.BorderSize = 0;
+			this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.button3.ImageIndex = 0;
+			this.button3.ImageList = this.pngList;
+			this.button3.Location = new System.Drawing.Point(563, 18);
+			this.button3.Name = "button3";
+			this.button3.Size = new System.Drawing.Size(31, 32);
+			this.button3.TabIndex = 13;
+			this.toolTip1.SetToolTip(this.button3, "打开串口");
+			this.button3.UseVisualStyleBackColor = true;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Location = new System.Drawing.Point(290, 28);
+			this.label10.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(29, 12);
+			this.label10.TabIndex = 12;
+			this.label10.Text = "端口";
+			// 
+			// label11
+			// 
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(8, 28);
+			this.label11.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(17, 12);
+			this.label11.TabIndex = 11;
+			this.label11.Text = "IP";
+			// 
+			// comboBox5
+			// 
+			this.comboBox5.FormattingEnabled = true;
+			this.comboBox5.Items.AddRange(new object[] {
+            "0.0.0.0"});
+			this.comboBox5.Location = new System.Drawing.Point(61, 25);
+			this.comboBox5.Margin = new System.Windows.Forms.Padding(2);
+			this.comboBox5.Name = "comboBox5";
+			this.comboBox5.Size = new System.Drawing.Size(160, 20);
+			this.comboBox5.TabIndex = 10;
+			// 
+			// comboBox6
+			// 
+			this.comboBox6.FormattingEnabled = true;
+			this.comboBox6.Location = new System.Drawing.Point(340, 25);
+			this.comboBox6.Margin = new System.Windows.Forms.Padding(2);
+			this.comboBox6.Name = "comboBox6";
+			this.comboBox6.Size = new System.Drawing.Size(160, 20);
+			this.comboBox6.TabIndex = 9;
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.ForeColor = System.Drawing.Color.ForestGreen;
+			this.label12.Location = new System.Drawing.Point(575, 14);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(323, 48);
+			this.label12.TabIndex = 13;
+			this.label12.Text = "UDP 通讯不分客户端和服务器，所有 UDP 组件都是平等的，\r\n不需要连接，选好服务器地址和端口后即可发送/接收数\r\n据。作为服务器时，IP 地址参数无效，默认" +
+    "接收任何 IP\r\n的 UDP 数据";
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(8, 27);
+			this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(41, 12);
+			this.label7.TabIndex = 11;
+			this.label7.Text = "目的IP";
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(258, 27);
+			this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(29, 12);
+			this.label6.TabIndex = 12;
+			this.label6.Text = "端口";
+			// 
+			// cbUdpClientPort
+			// 
+			this.cbUdpClientPort.FormattingEnabled = true;
+			this.cbUdpClientPort.Location = new System.Drawing.Point(308, 24);
+			this.cbUdpClientPort.Margin = new System.Windows.Forms.Padding(2);
+			this.cbUdpClientPort.Name = "cbUdpClientPort";
+			this.cbUdpClientPort.Size = new System.Drawing.Size(160, 20);
+			this.cbUdpClientPort.TabIndex = 9;
+			this.cbUdpClientPort.SelectedIndexChanged += new System.EventHandler(this.cbUdpClientPort_SelectedIndexChanged);
+			// 
+			// cbUdpClientIP
+			// 
+			this.cbUdpClientIP.FormattingEnabled = true;
+			this.cbUdpClientIP.Items.AddRange(new object[] {
+            "255.255.255.255",
+            "127.0.0.1"});
+			this.cbUdpClientIP.Location = new System.Drawing.Point(55, 24);
+			this.cbUdpClientIP.Margin = new System.Windows.Forms.Padding(2);
+			this.cbUdpClientIP.Name = "cbUdpClientIP";
+			this.cbUdpClientIP.Size = new System.Drawing.Size(160, 20);
+			this.cbUdpClientIP.TabIndex = 10;
+			this.toolTip1.SetToolTip(this.cbUdpClientIP, "255.255.255.255表示广播");
+			this.cbUdpClientIP.SelectedIndexChanged += new System.EventHandler(this.cbUdpClientIP_SelectedIndexChanged);
+			// 
+			// btnStartUDPServ
+			// 
+			this.btnStartUDPServ.FlatAppearance.BorderSize = 0;
+			this.btnStartUDPServ.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnStartUDPServ.ImageIndex = 0;
+			this.btnStartUDPServ.ImageList = this.pngList;
+			this.btnStartUDPServ.Location = new System.Drawing.Point(492, 17);
+			this.btnStartUDPServ.Name = "btnStartUDPServ";
+			this.btnStartUDPServ.Size = new System.Drawing.Size(31, 32);
+			this.btnStartUDPServ.TabIndex = 14;
+			this.toolTip1.SetToolTip(this.btnStartUDPServ, "启动接收");
+			this.btnStartUDPServ.UseVisualStyleBackColor = true;
+			this.btnStartUDPServ.Click += new System.EventHandler(this.btnStartUDPServ_Click);
 			// 
 			// TransferForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(948, 714);
-			this.Controls.Add(this.测试);
-			this.Controls.Add(this.groupBoxSerial);
+			this.ClientSize = new System.Drawing.Size(948, 766);
+			this.Controls.Add(this.tabMode);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox4);
-			this.Controls.Add(this.configGroup);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -640,8 +882,6 @@
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TransferForm_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TransferForm_FormClosed);
 			this.Load += new System.EventHandler(this.TransferForm_Load);
-			this.configGroup.ResumeLayout(false);
-			this.configGroup.PerformLayout();
 			this.groupBox4.ResumeLayout(false);
 			this.groupBox4.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
@@ -649,8 +889,16 @@
 			this.groupBox1.ResumeLayout(false);
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
-			this.groupBoxSerial.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).EndInit();
+			this.tabMode.ResumeLayout(false);
+			this.tabSerial.ResumeLayout(false);
+			this.tabSerial.PerformLayout();
+			this.tabUdpClient.ResumeLayout(false);
+			this.tabUdpClient.PerformLayout();
+			this.tabTcpServ.ResumeLayout(false);
+			this.tabTcpServ.PerformLayout();
+			this.tabTcpClient.ResumeLayout(false);
+			this.tabTcpClient.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -660,9 +908,7 @@
 
 		private System.Windows.Forms.OpenFileDialog ofDlg;
 		private System.Windows.Forms.SaveFileDialog sfDlg;
-		private System.Windows.Forms.GroupBox configGroup;
 		private System.Windows.Forms.ComboBox cbBits;
-		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.ComboBox cbCom;
 		private System.Windows.Forms.GroupBox groupBox4;
 		private System.Windows.Forms.Button btnSendData;
@@ -699,8 +945,6 @@
 		private System.Windows.Forms.Button btnDownData;
 		private System.Windows.Forms.Button btnUpData;
 		private System.Windows.Forms.Button btnSaveData;
-		private System.Windows.Forms.GroupBox groupBoxSerial;
-		private System.Windows.Forms.Button btnStartSerial;
 		private System.Windows.Forms.ImageList pngList;
 		private System.Windows.Forms.CheckBox cbEscape;
 		private System.Windows.Forms.Button 测试;
@@ -710,6 +954,29 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox tbPackDuration;
 		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.TabControl tabMode;
+		private System.Windows.Forms.TabPage tabSerial;
+		private System.Windows.Forms.TabPage tabUdpClient;
+		private System.Windows.Forms.TabPage tabTcpServ;
+		private System.Windows.Forms.TabPage tabTcpClient;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Button btnStartSerial;
+		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.ComboBox comboBox3;
+		private System.Windows.Forms.ComboBox comboBox4;
+		private System.Windows.Forms.Button button3;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.ComboBox comboBox5;
+		private System.Windows.Forms.ComboBox comboBox6;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.ComboBox cbUdpClientIP;
+		private System.Windows.Forms.ComboBox cbUdpClientPort;
+		private System.Windows.Forms.Button btnStartUDPServ;
 
     }
 }

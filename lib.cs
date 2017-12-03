@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.IO;
+using System.Net.Sockets;
+using System.Net;
 
 namespace SocketSerialTools {
 	public class lib {
@@ -35,6 +37,37 @@ namespace SocketSerialTools {
 			} finally {
 			}
 			return null;
+		}
+		// 获得本机局域网IP地址  
+		public static string[] getIPAddress() {
+			IPHostEntry he = Dns.GetHostEntry(Dns.GetHostName());
+			List<String> ips = new List<String>();
+			for (int i = 0; i < he.AddressList.Length;i++ ) {
+				ips.Add(he.AddressList[i].ToString());
+			}
+			return ips.ToArray();
+		}
+		public static ushort getValidPort(string port) {
+			ushort iPort = 0xFFFF;
+			UInt16.TryParse(port, out iPort);
+			return iPort;
+		}
+
+		public static IPAddress getValidIP(string ip) {
+			IPAddress lip = null;
+			//测试IP是否有效  
+			try {
+				//是否为空  
+				if (!IPAddress.TryParse(ip, out lip)) {
+					return null;
+				}
+			} catch (Exception e) {
+				//ArgumentException,   
+				//FormatException,   
+				//OverflowException  
+				return null;
+			}
+			return lip;
 		}
 	}
 }

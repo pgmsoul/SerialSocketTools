@@ -12,8 +12,15 @@ using System.Diagnostics;
 namespace SocketSerialTools {
 	[Serializable]
 	class Config {
-		public List<string> serial_baud_rate = new List<String>();
-		public string select_serial_port = "",file_name = "";
+		public List<string> serial_baud_rate = new List<String>(),
+			udp_client_ips = new List<String>(),
+			udp_client_ports = new List<String>(),
+			tcp_client_ips = new List<String>(),
+			tcp_client_ports = new List<String>(),
+			tcp_serv_ips = new List<String>(),
+			tcp_serv_ports = new List<String>();
+		public string select_serial_port = "",file_name = "",select_tab = "",
+			select_udp_client_ip = "127.0.0.1",select_udp_client_port = "";
 		public int select_baud_rate = 115200, pack_duration = 0;
 		public string send_encode = "ascii", recv_encode = "ascii";
 		public bool use_escape = false;

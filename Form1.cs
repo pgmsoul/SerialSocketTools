@@ -16,6 +16,8 @@ using System.Security.Cryptography;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using Noesis.Javascript;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SocketSerialTools {
 	public partial class TransferForm : Form {
@@ -26,6 +28,12 @@ namespace SocketSerialTools {
 		private SendDataStorage sds = null;
 		private bool initComplete = false;
 		private int sumRecv = 0, sumSend = 0;
+		enum TransferMode {
+			Serial,
+			UDP,
+			TCPServ,
+			TCPClient
+		}
 		#endregion
 		
 		#region SerialPort
@@ -272,22 +280,39 @@ namespace SocketSerialTools {
 		#endregion
 
 		#region Method
+		private TransferMode curMode = TransferMode.Serial;
+		private void setTransferMode() {
+			if (tabMode.SelectedTab == tabUdpClient) {
+				cfg.select_tab = "udp_client";
+				curMode = TransferMode.UDP;
+				initUdpClientPage();
+			} else if (tabMode.SelectedTab == tabSerial) {
+				cfg.select_tab = "serial";
+				curMode = TransferMode.Serial;
+				initSerialPage();
+			} else if (tabMode.SelectedTab == tabTcpClient) {
+				cfg.select_tab = "tcp_client";
+				curMode = TransferMode.TCPClient;
+			} else if (tabMode.SelectedTab == tabTcpServ) {
+				curMode = TransferMode.TCPServ;
+				cfg.select_tab = "tcp_serv";
+			}
+		}
+		JavascriptContext context = new JavascriptContext();
 		private string handleJs(string js, string raw) {
 			string str = "";
-			using (JavascriptContext context = new JavascriptContext()) {
-				context.SetParameter("input", raw);
-				try {
-					context.Run(js);
-					str = context.GetParameter("output").ToString();
-				} catch (JavascriptException je) {
-					str = "\r\n\r\ninput: " + raw;
-					str += "\r\n" + je.Message;
-					str += "\r\nLine: " + je.Line;
-					str += "\r\nColum: " + je.StartColumn + " - " + je.EndColumn;
-					string[] lines = js.Split('\n');
-					str += "\r\nSource:\r\n" + lines[je.Line-1];
-					return str;
-				}
+			context.SetParameter("input", raw);
+			try {
+				context.Run(js);
+				str = context.GetParameter("output").ToString();
+			} catch (JavascriptException je) {
+				str = "\r\n\r\ninput: " + raw;
+				str += "\r\n" + je.Message;
+				str += "\r\nLine: " + je.Line;
+				str += "\r\nColum: " + je.StartColumn + " - " + je.EndColumn;
+				string[] lines = js.Split('\n');
+				str += "\r\nSource:\r\n" + lines[je.Line-1];
+				return str;
 			}
 			return str;
 		}
@@ -446,15 +471,6 @@ namespace SocketSerialTools {
 			cfg = c;
 			setRecvEncode(cfg.recv_encode);
 			setSendEncode(cfg.send_encode);
-			init_Serial_List();
-			int select = cbCom.Items.IndexOf(cfg.select_serial_port);
-			if(select!=-1){
-				cbCom.SelectedIndex = select;
-			}
-			for (int i = 0; i < cfg.serial_baud_rate.Count; i++) {
-				cbBits.Items.Add(cfg.serial_baud_rate[i]);
-			}
-			cbBits.Text = "" + cfg.select_baud_rate;
 
 			cbEscape.Checked = cfg.use_escape;
 
@@ -463,6 +479,45 @@ namespace SocketSerialTools {
 			tbPackDuration.Text = cfg.pack_duration.ToString();
 
 			this.Text = "" + c.file_name + " -- " + this.Text;
+		}
+		private void initSerialPage() {
+			init_Serial_List();
+			int select = cbCom.Items.IndexOf(cfg.select_serial_port);
+			if (select != -1) {
+				cbCom.SelectedIndex = select;
+			}
+			cbBits.Items.Clear();
+			for (int i = 0; i < cfg.serial_baud_rate.Count; i++) {
+				cbBits.Items.Add(cfg.serial_baud_rate[i]);
+			}
+			cbBits.Text = "" + cfg.select_baud_rate;
+		}
+		private void initUdpClientPage() {
+			cbUdpClientIP.Items.Clear();
+			cbUdpClientIP.Items.Add("127.0.0.1");
+			cbUdpClientIP.Items.Add("255.255.255.255");
+			string[] ips = lib.getIPAddress();
+			for (int i = 0; i < ips.Length; i++) {
+				string ip = ips[i];
+				if (ip.IndexOf(":") == -1)
+					cbUdpClientIP.Items.Add(ip);
+			}
+			for (int i = 0; i < cfg.udp_client_ips.Count; i++) {
+					String ip = cfg.udp_client_ips[i];
+					if (cbUdpClientIP.Items.IndexOf(ip) == -1) {
+						cbUdpClientIP.Items.Add(ip);
+					}
+				}
+			cbUdpClientIP.Text = cfg.select_udp_client_ip;
+
+			cbUdpClientPort.Items.Clear();
+			for (int i = 0; i < cfg.udp_client_ports.Count; i++) {
+				string port = cfg.udp_client_ports[i];
+				if (cbUdpClientPort.Items.IndexOf(port) == -1) {
+					cbUdpClientPort.Items.Add(port);
+				}
+			}
+			cbUdpClientPort.Text = cfg.select_udp_client_port;
 		}
 		private void showTip(string tip) {
 			infoBox.Text = tip;
@@ -473,6 +528,9 @@ namespace SocketSerialTools {
 			infoBox.ForeColor = Color.DarkGreen;
 		}
 		private void showRedTip(string tip) {
+			//此函数可能在其它线程调用，所以可能造成死锁，如果检测到已经关闭操作，不再执行
+			if (closeFlag)
+				return;
 			infoBox.Text = tip;
 			infoBox.ForeColor = Color.Red;
 		}
@@ -483,6 +541,113 @@ namespace SocketSerialTools {
 			}
 			serialPort.Write(data, offset, length);
 			return true;
+		}
+		private UdpClient udpClient;
+		private bool sendUDPData(byte[] data, int offset, int length) {
+			if (length > 8192) {
+				showRedTip("UDP 最大包长度不能超过 8192");
+				return false;
+			}
+			UDPAddr ua = getCurrentIPAndPort();
+			IPEndPoint ipep = new IPEndPoint(ua.ip, ua.port);
+			if (udpClient == null)
+				udpClient = new UdpClient();
+			try {
+				udpClient.Send(data, length, ipep);
+			} catch (Exception e) {
+				showRedTip(e.Message);
+				return false;
+			}
+			return true;
+		}
+		private bool recvThreadRunning = false;
+		private void startUdpRecv() {
+			if (recvThreadRunning)
+				return;
+			recvThreadRunning = true;
+			new Thread(() => onUdpRecv()).Start();
+		}
+		private void onUdpRecv() {
+			btnStartUDPServ.ImageIndex = 1;
+			cbUdpClientPort.Enabled = false;
+			toolTip1.SetToolTip(btnStartUDPServ, "关闭接收");
+
+			UDPAddr ua = getCurrentIPAndPort();
+			if (udpClient == null) {//
+				IPEndPoint localIpep = new IPEndPoint(IPAddress.Parse("0.0.0.0"), ua.port);
+				udpClient = new UdpClient(localIpep);
+			}
+			IPEndPoint remotePoint = new IPEndPoint(IPAddress.Any, 0);
+			while (true) {
+				try {
+					byte[] data = udpClient.Receive(ref remotePoint);
+					parsePack(data, data.Length);
+				} catch(Exception e) {
+					showRedTip(e.Message);
+					break;
+				}
+			}
+			recvThreadRunning = false;
+			if (closeFlag) {
+				return;
+			}
+			btnStartUDPServ.ImageIndex = 0;
+			cbUdpClientPort.Enabled = true;
+			toolTip1.SetToolTip(btnStartUDPServ, "启动接收");
+			udpClient = null;
+		}
+		private void closeUdpRecv() {
+			if (udpClient != null)
+				udpClient.Close();
+		}
+		class UDPAddr {
+			public IPAddress ip;
+			public ushort port;
+			public UDPAddr(IPAddress _ip, ushort _port) {
+				ip = _ip;
+				port = _port;
+			}
+		}
+		private UDPAddr getCurrentIPAndPort() {
+			//验证 ip 地址字串
+			string sip = cbUdpClientIP.Text;
+			IPAddress ip = lib.getValidIP(sip);
+			if (ip == null) {
+				showRedTip("IP 地址不正确");
+				return null;
+			}
+			//验证端口数字
+			string sport = cbUdpClientPort.Text;
+			ushort port = lib.getValidPort(sport);
+			if (port == 0xffff) {
+				showRedTip("端口必须是不大于 65535 的整数不正确");
+				return null;
+			}
+			//保存
+			bool newItem = false;
+			if (cbUdpClientIP.Items.IndexOf(sip) == -1) {
+				cbUdpClientIP.Items.Insert(0, sip);
+				cfg.udp_client_ips.Insert(0, sip);
+				newItem = true;
+			}
+			if (cbUdpClientPort.Items.IndexOf(sport) == -1) {
+				cbUdpClientPort.Items.Insert(0, sport);
+				cfg.udp_client_ports.Insert(0, sport);
+				newItem = true;
+			}
+			if (sport != cfg.select_udp_client_port) {
+				cfg.select_udp_client_port = sport;
+				newItem = true;
+			}
+			if (sip != cfg.select_udp_client_ip) {
+				cfg.select_udp_client_ip = sip;
+				newItem = true;
+			}
+			if (newItem) {
+				saveConfig();
+			}
+
+			return new UDPAddr(ip,port);
 		}
 		#endregion
 
@@ -500,8 +665,29 @@ namespace SocketSerialTools {
 			loadData(conf);
 			loadJs();
 			initPackTimer();
+			initTabPage();
 			initComplete = true;
 			System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
+		}
+		private void initTabPage() {
+			if (cfg.select_tab == "udp_client") {
+				tabMode.SelectedTab = tabUdpClient;
+				curMode = TransferMode.UDP;
+				initUdpClientPage();
+			} else if (cfg.select_tab == "tcp_serv") {
+			} else if (cfg.select_tab == "tcp_client") {
+			} else if (cfg.select_tab == "serial") {
+				tabMode.SelectedTab = tabSerial;
+				curMode = TransferMode.Serial;
+				initSerialPage();
+			}
+		}
+		private void btnStartUDPServ_Click(object sender, EventArgs e) {
+			if (btnStartUDPServ.ImageIndex == 0) {
+				startUdpRecv();
+			} else {
+				closeUdpRecv();
+			}
 		}
 		private void tsbAddForm_Click(object sender, EventArgs e) {
 			new Thread(() => Application.Run(new TransferForm())).Start();
@@ -517,7 +703,8 @@ namespace SocketSerialTools {
 			}
 		}
 		private void timerRefreshSerialPort_Tick(object sender, EventArgs e) {
-			init_Serial_List();
+			if (curMode == TransferMode.Serial)
+				init_Serial_List();
 		}
 		private void recvEncode_Changed(object sender, EventArgs e) {
 			if (sender == rbGbk) {
@@ -598,9 +785,15 @@ namespace SocketSerialTools {
 		private void TransferForm_Load(object sender, EventArgs e) {
 			formList.Add(this);
 		}
+		bool closeFlag = false;
 		private void TransferForm_FormClosing(object sender, FormClosingEventArgs e) {
 			packTimer.Enabled = false;
+			closeFlag = true;
 			close_Serial();
+			closeUdpRecv();
+			while (recvThreadRunning) {
+				Thread.Sleep(10);
+			}
 		}
 		private void TransferForm_FormClosed(object sender, FormClosedEventArgs e) {
 			formList.Remove(this);
@@ -628,13 +821,11 @@ namespace SocketSerialTools {
 				if (str == null)
 					return;
 				data = System.Text.Encoding.GetEncoding("GBK").GetBytes(str);
-				result = sendSerialPortData(data,0,data.Length);
 			}else if(cfg.send_encode=="utf8"){
 				string str = getEscapeString(tbSend.Text);
 				if (str == null)
 					return;
 				data = System.Text.Encoding.UTF8.GetBytes(str);
-				result = sendSerialPortData(data, 0, data.Length);
 			} else if (cfg.send_encode == "hex") {
 				string error;
 				data = hexToByte(tbSend.Text,out error);
@@ -642,7 +833,17 @@ namespace SocketSerialTools {
 					showRedTip(error);
 					return;
 				}
+			} else {
+				showRedTip("选择编码方式");
+				return;
+			}
+			if (curMode == TransferMode.Serial) {
 				result = sendSerialPortData(data, 0, data.Length);
+			} else if (curMode == TransferMode.UDP) {
+				result = sendUDPData(data, 0, data.Length);
+			} else {
+				showRedTip("选择传输方式：串口、UDP、TCP服务器、TCP客户端");
+				return;
 			}
 			if (!result) {
 				return;
@@ -737,6 +938,8 @@ namespace SocketSerialTools {
 			if (DateTime.Now.Ticks - lastLoadTime < 10000) {//小于一毫秒跳过
 				return;
 			}
+			if (cfg.recv_js == "")
+				return;
 			string path = ".\\js\\" + cfg.recv_js;
 			FileStream fs = null;
 			try {
@@ -803,6 +1006,18 @@ namespace SocketSerialTools {
 				e.Handled = true;
 			}
 		}
+		private void tabMode_SelectedIndexChanged(object sender, EventArgs e) {
+			setTransferMode();
+			saveConfig();
+		}
+		private void cbUdpClientIP_SelectedIndexChanged(object sender, EventArgs e) {
+			cfg.select_udp_client_ip = cbUdpClientIP.Text;
+			saveConfig();
+		}
+		private void cbUdpClientPort_SelectedIndexChanged(object sender, EventArgs e) {
+			cfg.select_udp_client_port = cbUdpClientPort.Text;
+			saveConfig();
+		}
 		#endregion
 
 		#region Test
@@ -848,5 +1063,6 @@ namespace SocketSerialTools {
 			}
 		}
 		#endregion
+
 	}
 }
