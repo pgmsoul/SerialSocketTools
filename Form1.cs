@@ -809,6 +809,58 @@ namespace SocketSerialTools {
 			sumSend = 0;
 			showSendCount(0);
 		}
+		private string hexToString(string hex,Encoding en) {
+			string error;
+			byte[] data = hexToByte(hex, out error);
+			if (error != null) {
+				showRedTip(error);
+				return null;
+			}
+			try {
+				return en.GetString(data);
+			} catch (Exception e) {
+				showRedTip(e.Message);
+			}
+			return null;
+		}
+		private string StringToHex(string str,Encoding en) {
+			byte[] data = en.GetBytes(str);
+			return byteToHex(data, data.Length);
+		}
+		private void tbHexToStr(TextBox tb) {
+			string str = tb.Text;
+			//当前文本转换为目的编码
+			if (cfg.recv_encode == "hex") {
+				showRedTip("编码选择 ASCII 或者 UTF8");
+				return;
+			} else if(cfg.recv_encode=="ascii"){
+				str = hexToString(str, Encoding.GetEncoding("GBK"));
+			} else if (cfg.recv_encode == "utf8") {
+				str = hexToString(str,Encoding.UTF8);
+			}
+			if (str == null) {
+				showRedTip("编码转换失败");
+				return;
+			}
+			tb.Text = str;
+		}
+		private void tbStrToHex(TextBox tb) {
+			string str = tb.Text;
+			//当前文本转换为目的编码
+			if (cfg.recv_encode == "hex") {
+				showRedTip("编码选择 ASCII 或者 UTF8");
+				return;
+			} else if (cfg.recv_encode == "ascii") {
+				str = StringToHex(str, Encoding.GetEncoding("GBK"));
+			} else if (cfg.recv_encode == "utf8") {
+				str = StringToHex(str, Encoding.UTF8);
+			}
+			if (str == null) {
+				showRedTip("编码转换失败");
+				return;
+			}
+			tb.Text = str;
+		}
 		private void btnSendData_Click(object sender, EventArgs e) {
 			if (tbSend.Text.Length == 0) {
 				showRedTip("请输入传输内容");
@@ -1017,6 +1069,18 @@ namespace SocketSerialTools {
 		private void cbUdpClientPort_SelectedIndexChanged(object sender, EventArgs e) {
 			cfg.select_udp_client_port = cbUdpClientPort.Text;
 			saveConfig();
+		}
+		private void btnRecvHexToStr_Click(object sender, EventArgs e) {
+			tbHexToStr(tbRecv);
+		}
+		private void btnRecvStrToHex_Click(object sender, EventArgs e) {
+			tbStrToHex(tbRecv);
+		}
+		private void btnSendHexToStr_Click(object sender, EventArgs e) {
+			tbHexToStr(tbSend);
+		}
+		private void btnSendStrToHex_Click(object sender, EventArgs e) {
+			tbStrToHex(tbSend);
 		}
 		#endregion
 
